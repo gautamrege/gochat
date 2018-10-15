@@ -2,22 +2,18 @@ syntax = "proto3";
 
 package api;
 
-import "google/protobuf/timestamp.proto";
+//import "google/protobuf/timestamp.proto";
 
 message Handle {
   string name = 1;
-  int32 port = 2;
-  google.protobuf.Timestamp created_at = 3;
-}
-
-message Message {
-  google.protobuf.Timestamp created_at = 1;
-  string text = 2;
+  string host = 2;
+  int32 port = 3;
 }
 
 message ChatRequest {
   Handle from = 1;
-  Message chat = 2;
+  Handle to = 2;
+  string message = 3;
 }
 
 message ChatResponse {
