@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 /* This is a chatroom that is registered on this server! */
 type Chatroom struct {
 	Name       string
@@ -23,6 +25,7 @@ type ChatroomSync struct {
 var CHATROOMS ChatroomSync
 
 func (hs *ChatroomSync) Insert(h Chatroom) (err error) {
+	return nil
 }
 
 func (hs *ChatroomSync) Delete(h Chatroom) {
@@ -30,6 +33,7 @@ func (hs *ChatroomSync) Delete(h Chatroom) {
 
 func NewChatroom(name string) (c *Chatroom) {
 	// create a new chatroom and return it.
+	return nil
 }
 
 func (c *Chatroom) Print(chat Chat) {

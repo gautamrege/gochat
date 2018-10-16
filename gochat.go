@@ -1,1 +1,1 @@
-package gochat
+package main

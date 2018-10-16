@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"sync"
+	"time"
 )
 
 type Handle struct {
 	Name       string
 	Host       string
 	Port       int32
-	Created_at Time.time
+	Created_at time.Time
 }
 
 // Ensure that handles are added / removed using a mutex!
@@ -22,6 +23,7 @@ var ME Handle
 var HANDLES HandleSync
 
 func (hs *HandleSync) Insert(h Handle) (err error) {
+	return nil
 }
 
 func (hs *HandleSync) Delete(h Handle) {

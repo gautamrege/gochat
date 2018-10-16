@@ -1,5 +1,7 @@
 package main
 
+import "sync"
+
 func main() {
 	// Parse flags for host, port and name
 	// Create your own Global Handle ME
@@ -22,10 +24,10 @@ func main() {
 	// gRPC listener
 	go listen(&wg, exit)
 
-	for {
-		// Loop indefinitely and render Term
-		// When we need to exit, send true 3 times on exit channel!
-	}
+	//for {
+	//	// Loop indefinitely and render Term
+	//	// When we need to exit, send true 3 times on exit channel!
+	//}
 
 	// exit cleanly on waitgroup
 	wg.Wait()
@@ -42,6 +44,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 // isAlive go-routine that publishes it's Handle on 33333
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
+//	broadcast
 }
 
 // cleanup Dead Handlers
@@ -55,4 +58,5 @@ func listen(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 
 	// initiate gRPC
+
 }
