@@ -85,6 +85,12 @@ func parseAndExecInput(input string) {
 	switch {
 	case cmd == "":
 		break
+	case cmd == "?":
+		fmt.Printf(`/users : List all users
+/exit  : Exit chat
+@<user> Type some message. e.g. @joe This works!
+\n`)
+		break
 	case strings.ToLower(cmd) == "/users":
 		fmt.Println(HANDLES)
 		break
@@ -99,7 +105,6 @@ func parseAndExecInput(input string) {
 
 		// send message to particular user
 		if h, ok := HANDLES.Get(cmd[1:]); ok {
-			fmt.Printf("Sending message to: %+v with message: %s\n", h, message)
 			sendChat(h, message)
 		} else {
 			fmt.Println("No user: ", cmd)
@@ -118,8 +123,6 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// Check if the handle is already in HANDLES. If not, add a new one!
 
-	fmt.Println("listening")
-
 	handle := Handle{}
 	for {
 		localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
@@ -133,7 +136,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 		decoder := gob.NewDecoder(buffer)
 		decoder.Decode(&handle)
 		if handle.Host != *host {
-			fmt.Println("listened data", handle)
+			//fmt.Println("listened data", handle)
 			HANDLES.Insert(handle.Handle)
 		}
 		connection.Close()
@@ -165,7 +168,7 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 				Created_at: time.Now(),
 			}
 
-			fmt.Println("Broadcast: ", handle)
+			//fmt.Println("Broadcast: ", handle)
 			encoder.Encode(handle)
 			conn.Write(buffer.Bytes())
 			buffer.Reset()
