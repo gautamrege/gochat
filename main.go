@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 	"time"
+
 	pb "github.com/gautamrege/gochat/api"
 )
 
@@ -29,6 +30,8 @@ func main() {
 	// Create your own Global Handle ME
 	var wg sync.WaitGroup
 	wg.Add(4)
+
+	HANDLES.HandleMap = make(map[string]Handle)
 
 	// exit channel is a buffered channel for 5 exit patterns
 	exit := make(chan bool, 5)
@@ -71,15 +74,16 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer connection.Close()
 	fmt.Println("listening")
 
-	h := Handle{}
+	handle := Handle{}
 	for {
 		inputBytes := make([]byte, 4096)
 		length, _, _ := connection.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
-		decoder.Decode(&h)
-		if h.Host != *host {
-			fmt.Println("listened data", h)
+		decoder.Decode(&handle)
+		if handle.Host != *host {
+			fmt.Println("listened data", handle)
+			HANDLES.Insert(handle)
 		}
 	}
 }
@@ -106,7 +110,6 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 				Host:       *host,
 				Created_at: time.Now(),
 			}
-
 
 			fmt.Println("Broadcast: ", handle)
 			encoder.Encode(handle)
