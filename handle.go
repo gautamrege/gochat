@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	pb "github.com/gautamrege/gochat/api"
 	"sync"
 	"time"
 )
@@ -19,7 +20,7 @@ type HandleSync struct {
 	HandleMap map[string]Handle
 }
 
-var ME Handle
+var ME pb.Handle
 var HANDLES HandleSync
 
 func (hs *HandleSync) Insert(h Handle) (err error) {
@@ -34,6 +35,19 @@ func (hs *HandleSync) Insert(h Handle) (err error) {
 	return nil
 }
 
+func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
+	hs.Lock()
+	tmp, ok := hs.HandleMap[name]
+	if ok {
+		h.Name = tmp.Name
+		h.Port = tmp.Port
+		h.Host = tmp.Host
+	}
+	hs.Unlock()
+
+	return
+}
+
 func (hs *HandleSync) Delete(h Handle) {
 	hs.Lock()
 	delete(hs.HandleMap, h.Name)
@@ -41,6 +55,15 @@ func (hs *HandleSync) Delete(h Handle) {
 	fmt.Println("Handle Removed for", h.Name)
 }
 
-func (h *Handle) String() string {
+func (h Handle) String() string {
 	return fmt.Sprintf("%s@%s:%d", h.Name, h.Host, h.Port)
+}
+
+func (hs HandleSync) String() string {
+	users := "\n"
+	for name, _ := range hs.HandleMap {
+		users = fmt.Sprintf("%s%s\n", users, name)
+	}
+
+	return users
 }

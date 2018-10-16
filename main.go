@@ -1,16 +1,17 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/gob"
 	"flag"
 	"fmt"
+	pb "github.com/gautamrege/gochat/api"
 	"net"
 	"os"
+	"strings"
 	"sync"
 	"time"
-
-	pb "github.com/gautamrege/gochat/api"
 )
 
 var (
@@ -48,16 +49,59 @@ func main() {
 	// gRPC listener
 	go listen(&wg, exit)
 
-	//for {
-	//	// Loop indefinitely and render Term
-	//	// When we need to exit, send true 3 times on exit channel!
-	//}
-	time.Sleep(1 * time.Second)
-	testChat()
+	ME = pb.Handle{
+		Name: *name,
+		Host: *host,
+		Port: int32(*port),
+	}
+
+	//addFakeHandles()
+
+	var input string
+	for {
+		fmt.Printf("> ")
+		input = readInput()
+
+		parseAndExecInput(input)
+		// Loop indefinitely and render Term
+		// When we need to exit, send true 3 times on exit channel!
+	}
+	//time.Sleep(1 * time.Second)
+	//testChat()
 
 	// exit cleanly on waitgroup
 	wg.Wait()
 	close(exit)
+}
+
+func parseAndExecInput(input string) {
+	// Split the line into 2 tokens (cmd and message)
+	tokens := strings.SplitN(input, " ", 2)
+	cmd := tokens[0]
+	switch {
+	case cmd == "":
+		break
+	case strings.ToLower(cmd) == "/users":
+		fmt.Println(HANDLES)
+		break
+	case strings.ToLower(cmd) == "/exit":
+		os.Exit(1)
+		break
+	case cmd[0] == '@':
+		message := "hi" // default
+		if len(tokens) > 1 {
+			message = tokens[1]
+		}
+
+		// send message to particular user
+		if h, ok := HANDLES.Get(cmd[1:]); ok {
+			fmt.Printf("Sending message to: %+v with message: %s\n", h, message)
+			sendChat(h, message)
+		} else {
+			fmt.Println("No user: ", cmd)
+		}
+		break
+	}
 }
 
 // Broadcast Listener
@@ -126,11 +170,32 @@ func cleanupDeadHandles(wg *sync.WaitGroup, exit chan bool) {
 	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and handle list
 }
 
-func testChat() {
+func testChat(message string) {
 	h := pb.Handle{
 		Name: "Anuj",
 		Host: "192.168.1.18",
 		Port: int32(3000),
 	}
-	sendChat(h, "wtf")
+	sendChat(h, message)
+}
+
+func addFakeHandles() {
+	for i := 0; i < 10; i++ {
+		h := Handle{
+			Name: fmt.Sprintf("test+%d", i),
+			Port: int32(i * 23),
+			Host: "fake IP",
+		}
+		HANDLES.Insert(h)
+	}
+}
+
+func readInput() string {
+	reader := bufio.NewReader(os.Stdin)
+	text, _ := reader.ReadString('\n')
+
+	// convert CRLF to LF
+	text = strings.Replace(text, "\n", "", -1)
+
+	return text
 }

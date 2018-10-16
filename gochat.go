@@ -60,11 +60,7 @@ func sendChat(h pb.Handle, message string) {
 			Host: h.Host,
 			Port: h.Port,
 		},
-		From: &pb.Handle{
-			Name: *name,
-			Host: *host,
-			Port: int32(*port),
-		},
+		From:    &ME,
 		Message: message,
 	}
 
