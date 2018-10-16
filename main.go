@@ -6,12 +6,13 @@ import (
 	"encoding/gob"
 	"flag"
 	"fmt"
-	pb "github.com/gautamrege/gochat/api"
 	"net"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	pb "github.com/gautamrege/gochat/api"
 )
 
 var (
@@ -75,6 +76,9 @@ func main() {
 }
 
 func parseAndExecInput(input string) {
+	helpStr := `/users :- Get list of live users
+@{user} message :- send message to specified user
+/exit :- Exit the Chat`
 	// Split the line into 2 tokens (cmd and message)
 	tokens := strings.SplitN(input, " ", 2)
 	cmd := tokens[0]
@@ -101,6 +105,10 @@ func parseAndExecInput(input string) {
 			fmt.Println("No user: ", cmd)
 		}
 		break
+	case strings.ToLower(cmd) == "/help":
+		fmt.Println(helpStr)
+	default:
+		fmt.Println(helpStr)
 	}
 }
 
