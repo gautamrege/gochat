@@ -16,17 +16,28 @@ type Handle struct {
 // Ensure that handles are added / removed using a mutex!
 type HandleSync struct {
 	sync.RWMutex
-	Handles []Handle
+	HandleMap map[string]Handle
 }
 
 var ME Handle
 var HANDLES HandleSync
 
 func (hs *HandleSync) Insert(h Handle) (err error) {
+	_, ok := hs.HandleMap[h.Name]
+	if !ok {
+		fmt.Println("New Handle Register for", h.Name)
+	}
+	hs.Lock()
+	hs.HandleMap[h.Name] = h
+	hs.Unlock()
 	return nil
 }
 
 func (hs *HandleSync) Delete(h Handle) {
+	hs.Lock()
+	delete(hs.HandleMap, h.Name)
+	hs.Unlock()
+	fmt.Println("Handle Removed for", h.Name)
 }
 
 func (h *Handle) String() string {

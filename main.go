@@ -31,6 +31,8 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(4)
 
+	HANDLES.HandleMap = make(map[string]Handle)
+
 	// exit channel is a buffered channel for 5 exit patterns
 	exit := make(chan bool, 5)
 
@@ -66,7 +68,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 
 	fmt.Println("listening")
 
-	h := Handle{}
+	handle := Handle{}
 	for {
 		localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
 		connection, err := net.ListenUDP("udp", localAddress)
@@ -77,9 +79,10 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 		length, _, _ := connection.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
-		decoder.Decode(&h)
-		if h.Host != *host {
-			fmt.Println("listened data", h)
+		decoder.Decode(&handle)
+		if handle.Host != *host {
+			fmt.Println("listened data", handle)
+			HANDLES.Insert(handle)
 		}
 		connection.Close()
 	}
