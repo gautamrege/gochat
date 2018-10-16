@@ -112,7 +112,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 
 	fmt.Println("listening")
 
-	handle := pb.Handle{}
+	handle := Handle{}
 	for {
 		localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
 		connection, err := net.ListenUDP("udp", localAddress)
@@ -126,7 +126,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 		decoder.Decode(&handle)
 		if handle.Host != *host {
 			fmt.Println("listened data", handle)
-			HANDLES.Insert(handle)
+			HANDLES.Insert(handle.Handle)
 		}
 		connection.Close()
 	}
