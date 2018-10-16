@@ -3,14 +3,14 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
 	"flag"
 	"fmt"
-	pb "github.com/gautamrege/gochat/api"
 	"net"
 	"os"
 	"sync"
 	"time"
+
+	pb "github.com/gautamrege/gochat/api"
 )
 
 var (
@@ -94,6 +94,7 @@ const listenerPort = 5000
 
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
+	var buffer bytes.Buffer
 
 	for {
 		select {
@@ -108,24 +109,17 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			handle := Handle{
 				Name:       *name,
 				Port:       int32(*port),
-				Host:       "192.168.1.135",
+				Host:       *host,
 				Created_at: time.Now(),
 			}
-			handleJson, err := json.Marshal(handle)
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(handleJson)
-			fmt.Println("Brodcast: ", handle)
-			time.Sleep(time.Second * 10)
 
-			var buffer bytes.Buffer
+			fmt.Println("Broadcast: ", handle)
+
 			encoder := gob.NewEncoder(&buffer)
-			for {
-				encoder.Encode(handle)
-				conn.Write(buffer.Bytes())
-				buffer.Reset()
-			}
+			encoder.Encode(handle)
+			conn.Write(buffer.Bytes())
+			buffer.Reset()
+			time.Sleep(time.Second * 10)
 		}
 	}
 }
