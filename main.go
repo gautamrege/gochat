@@ -1,15 +1,16 @@
 package main
 
 import (
-	"flag"
-	"fmt"
-	"os"
-	"sync"
-	"net"
 	"bytes"
 	"encoding/gob"
-	"time"
 	"encoding/json"
+	"flag"
+	"fmt"
+	pb "github.com/gautamrege/gochat/api"
+	"net"
+	"os"
+	"sync"
+	"time"
 )
 
 var (
@@ -48,6 +49,14 @@ func main() {
 	//	// Loop indefinitely and render Term
 	//	// When we need to exit, send true 3 times on exit channel!
 	//}
+	time.Sleep(1 * time.Second)
+
+	h := pb.Handle{
+		Name: "Anuj",
+		Host: "192.168.1.18",
+		Port: int32(10000),
+	}
+	sendChat(h, "wtf")
 
 	// exit cleanly on waitgroup
 	wg.Wait()
@@ -87,8 +96,8 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 
 	for {
 		select {
-			case <-exit:
-				break
+		case <-exit:
+			break
 		default:
 			conn, err := net.Dial("udp", "192.168.1.255:33333")
 			if err != nil {
