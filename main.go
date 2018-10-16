@@ -64,16 +64,15 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// Check if the handle is already in HANDLES. If not, add a new one!
 
-	localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
-	connection, err := net.ListenUDP("udp", localAddress)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer connection.Close()
 	fmt.Println("listening")
 
 	h := Handle{}
 	for {
+		localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
+		connection, err := net.ListenUDP("udp", localAddress)
+		if err != nil {
+			fmt.Println(err)
+		}
 		inputBytes := make([]byte, 4096)
 		length, _, _ := connection.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
@@ -82,13 +81,13 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 		if h.Host != *host {
 			fmt.Println("listened data", h)
 		}
+		connection.Close()
 	}
 }
 
 // isAlive go-routine that publishes it's Handle on 33333
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
-	var buffer bytes.Buffer
 
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
@@ -97,7 +96,7 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 		case <-exit:
 			break
 		default:
-			conn, err := net.Dial("udp", "192.168.1.255:33333")
+			conn, err := net.DialUDP("udp", nil, &net.UDPAddr{IP: []byte{192, 168, 1, 255}, Port: 33333})
 			if err != nil {
 				fmt.Println(err)
 			}
