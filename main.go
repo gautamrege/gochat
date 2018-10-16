@@ -3,10 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
 	"flag"
 	"fmt"
-	pb "github.com/gautamrege/gochat/api"
 	"net"
 	"os"
 	"sync"
@@ -90,11 +88,11 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 }
 
 // isAlive go-routine that publishes it's Handle on 33333
-const listenerPort = 5000
-
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
 	for {
 		select {
 		case <-exit:
@@ -108,24 +106,16 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			handle := Handle{
 				Name:       *name,
 				Port:       int32(*port),
-				Host:       "192.168.1.135",
+				Host:       *host,
 				Created_at: time.Now(),
 			}
-			handleJson, err := json.Marshal(handle)
-			if err != nil {
-				fmt.Println(err)
-			}
-			conn.Write(handleJson)
-			fmt.Println("Brodcast: ", handle)
-			time.Sleep(time.Second * 10)
 
-			var buffer bytes.Buffer
-			encoder := gob.NewEncoder(&buffer)
-			for {
-				encoder.Encode(handle)
-				conn.Write(buffer.Bytes())
-				buffer.Reset()
-			}
+
+			fmt.Println("Broadcast: ", handle)
+			encoder.Encode(handle)
+			conn.Write(buffer.Bytes())
+			buffer.Reset()
+			time.Sleep(time.Second * 10)
 		}
 	}
 }
