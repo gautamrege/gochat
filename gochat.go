@@ -41,9 +41,7 @@ func listen(wg *sync.WaitGroup, exit chan bool) {
 }
 
 func sendChat(h pb.Handle, message string) {
-
 	dest := fmt.Sprintf("%s:%d", h.Host, h.Port)
-	fmt.Printf("Dialing %v\n", dest)
 
 	conn, err := grpc.Dial(dest, grpc.WithInsecure())
 	if err != nil {
@@ -70,10 +68,9 @@ func sendChat(h pb.Handle, message string) {
 		Message: message,
 	}
 
-	fmt.Printf("Chat Request: %+v\n", req)
 	res, err := client.Chat(ctx, &req)
 	if err != nil {
-		log.Printf("ERROR: %v.Chat(_) = _, %v: ", client, err)
+		log.Printf("ERROR: Chat(): %v", err)
 	}
 	log.Println(res)
 	return
