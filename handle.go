@@ -33,7 +33,7 @@ func (hs *HandleSync) Insert(h pb.Handle) (err error) {
 			},
 			Created_at: time.Now(),
 		}
-		fmt.Println("New Handle Register for", h.Name)
+		fmt.Printf("\nNew User joined the chat: @%s\n>", h.Name)
 	}
 	hs.Unlock()
 	return nil
@@ -66,7 +66,7 @@ func (h Handle) String() string {
 func (hs HandleSync) String() string {
 	users := "\n"
 	for name, _ := range hs.HandleMap {
-		users = fmt.Sprintf("%s%s\n", users, name)
+		users = fmt.Sprintf("%s@%s\n", users, name)
 	}
 
 	return users
