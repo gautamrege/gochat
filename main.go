@@ -5,6 +5,11 @@ import (
 	"fmt"
 	"os"
 	"sync"
+	"net"
+	"bytes"
+	"encoding/gob"
+	"time"
+	"encoding/json"
 )
 
 var (
@@ -21,7 +26,6 @@ func main() {
 		os.Exit(1)
 	}
 	// Create your own Global Handle ME
-
 	var wg sync.WaitGroup
 	wg.Add(4)
 
@@ -55,12 +59,57 @@ func main() {
 func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// Check if the handle is already in HANDLES. If not, add a new one!
+
+	localAddress, _ := net.ResolveUDPAddr("udp", ":333333")
+	connection, err := net.ListenUDP("udp", localAddress)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer connection.Close()
+	fmt.Println("listening")
+
+	h := Handle{}
+	for {
+		inputBytes := make([]byte, 4096)
+		length, _, _ := connection.ReadFromUDP(inputBytes)
+		buffer := bytes.NewBuffer(inputBytes[:length])
+		decoder := gob.NewDecoder(buffer)
+		decoder.Decode(&h)
+		fmt.Println("listened data", h)
+	}
 }
 
 // isAlive go-routine that publishes it's Handle on 33333
+const listenerPort = 5000
+
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
-	//	broadcast
+
+	for {
+		select {
+			case <-exit:
+				break
+		default:
+			conn, err := net.Dial("udp", "192.168.1.255:33333")
+			if err != nil {
+				fmt.Println(err)
+			}
+			defer conn.Close()
+			handle := Handle{
+				Name:       "Varsha",
+				Port:       listenerPort,
+				Host:       "192.168.1.135",
+				Created_at: time.Now(),
+			}
+			handleJson, err := json.Marshal(handle)
+			if err != nil {
+				fmt.Println(err)
+			}
+			conn.Write(handleJson)
+			fmt.Println("Brodcast: ", handle)
+			time.Sleep(time.Second * 10)
+		}
+	}
 }
 
 // cleanup Dead Handlers
