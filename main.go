@@ -79,7 +79,9 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
 		decoder.Decode(&h)
-		fmt.Println("listened data", h)
+		if h.Host != *host {
+			fmt.Println("listened data", h)
+		}
 	}
 }
 
