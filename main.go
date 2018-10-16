@@ -1,13 +1,29 @@
 package main
 
-import "sync"
+import (
+	"flag"
+	"fmt"
+	"os"
+	"sync"
+)
+
+var (
+	name = flag.String("name", "", "The name you want to chat as")
+	port = flag.Int("port", 12345, "Port that your server will run on.")
+)
 
 func main() {
 	// Parse flags for host, port and name
+	flag.Parse()
+
+	if *name == "" {
+		fmt.Println("fuck off if you don't have a name")
+		os.Exit(1)
+	}
 	// Create your own Global Handle ME
 
 	var wg sync.WaitGroup
-	wg.Add(3)
+	wg.Add(4)
 
 	// exit channel is a buffered channel for 5 exit patterns
 	exit := make(chan bool, 5)
@@ -44,19 +60,11 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 // isAlive go-routine that publishes it's Handle on 33333
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
-//	broadcast
+	//	broadcast
 }
 
 // cleanup Dead Handlers
 func cleanupDeadHandles(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and handle list
-}
-
-// gRPC listener
-func listen(wg *sync.WaitGroup, exit chan bool) {
-	defer wg.Done()
-
-	// initiate gRPC
-
 }
