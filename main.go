@@ -70,7 +70,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// Check if the handle is already in HANDLES. If not, add a new one!
 
-	localAddress, _ := net.ResolveUDPAddr("udp", ":333333")
+	localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
 	connection, err := net.ListenUDP("udp", localAddress)
 	if err != nil {
 		fmt.Println(err)
@@ -106,8 +106,8 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			}
 			defer conn.Close()
 			handle := Handle{
-				Name:       "Varsha",
-				Port:       listenerPort,
+				Name:       *name,
+				Port:       int32(*port),
 				Host:       "192.168.1.135",
 				Created_at: time.Now(),
 			}
@@ -118,6 +118,14 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			conn.Write(handleJson)
 			fmt.Println("Brodcast: ", handle)
 			time.Sleep(time.Second * 10)
+
+			var buffer bytes.Buffer
+			encoder := gob.NewEncoder(&buffer)
+			for {
+				encoder.Encode(handle)
+				conn.Write(buffer.Bytes())
+				buffer.Reset()
+			}
 		}
 	}
 }
