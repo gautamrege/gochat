@@ -25,11 +25,12 @@ var HANDLES HandleSync
 func (hs *HandleSync) Insert(h Handle) (err error) {
 	_, ok := hs.HandleMap[h.Name]
 	if !ok {
+		h.Created_at = time.Now()
+		hs.Lock()
+		hs.HandleMap[h.Name] = h
+		hs.Unlock()
 		fmt.Println("New Handle Register for", h.Name)
 	}
-	hs.Lock()
-	hs.HandleMap[h.Name] = h
-	hs.Unlock()
 	return nil
 }
 
