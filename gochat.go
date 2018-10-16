@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -18,9 +17,9 @@ type chatServer struct {
 
 func (s *chatServer) Chat(ctx context.Context, req *pb.ChatRequest) (res *pb.ChatResponse, err error) {
 
-	fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message)
+	fmt.Println(fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
 
-	return &pb.ChatResponse{}, errors.New("")
+	return &pb.ChatResponse{}, nil
 }
 
 // gRPC listener
@@ -45,6 +44,7 @@ func sendChat(h pb.Handle, message string) {
 
 	dest := fmt.Sprintf("%s:%d", h.Host, h.Port)
 	fmt.Printf("Dialing %v\n", dest)
+
 	conn, err := grpc.Dial(dest, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
@@ -53,7 +53,7 @@ func sendChat(h pb.Handle, message string) {
 
 	client := pb.NewGoChatClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	req := pb.ChatRequest{
