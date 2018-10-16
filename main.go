@@ -16,14 +16,15 @@ import (
 var (
 	name = flag.String("name", "", "The name you want to chat as")
 	port = flag.Int("port", 12345, "Port that your server will run on.")
+	host = flag.String("host", "", "Host IP that your server is running on.")
 )
 
 func main() {
 	// Parse flags for host, port and name
 	flag.Parse()
 
-	if *name == "" {
-		fmt.Println("fuck off if you don't have a name")
+	if *name == "" || *host == "" {
+		fmt.Println("fuck off if you don't have a name and IP address :D")
 		os.Exit(1)
 	}
 	// Create your own Global Handle ME

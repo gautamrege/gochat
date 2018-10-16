@@ -27,7 +27,7 @@ func (s *chatServer) Chat(ctx context.Context, req *pb.ChatRequest) (res *pb.Cha
 func listen(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *host, *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -43,7 +43,8 @@ func listen(wg *sync.WaitGroup, exit chan bool) {
 
 func sendChat(h pb.Handle, message string) {
 
-	dest := fmt.Sprintf("%s:%s", h.Host, h.Port)
+	dest := fmt.Sprintf("%s:%d", h.Host, h.Port)
+	fmt.Printf("Dialing %v\n", dest)
 	conn, err := grpc.Dial(dest, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
@@ -63,15 +64,16 @@ func sendChat(h pb.Handle, message string) {
 		},
 		From: &pb.Handle{
 			Name: *name,
-			Host: "TBD",
+			Host: *host,
 			Port: int32(*port),
 		},
 		Message: message,
 	}
 
+	fmt.Printf("Chat Request: %+v\n", req)
 	res, err := client.Chat(ctx, &req)
 	if err != nil {
-		log.Fatalf("%v.Chat(_) = _, %v: ", client, err)
+		log.Printf("ERROR: %v.Chat(_) = _, %v: ", client, err)
 	}
 	log.Println(res)
 	return
