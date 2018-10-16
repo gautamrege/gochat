@@ -112,7 +112,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 
 	fmt.Println("listening")
 
-	handle := Handle{}
+	handle := pb.Handle{}
 	for {
 		localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
 		connection, err := net.ListenUDP("udp", localAddress)
@@ -149,9 +149,11 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			}
 			defer conn.Close()
 			handle := Handle{
-				Name:       *name,
-				Port:       int32(*port),
-				Host:       *host,
+				Handle: pb.Handle{
+					Name: *name,
+					Port: int32(*port),
+					Host: *host,
+				},
 				Created_at: time.Now(),
 			}
 
@@ -181,7 +183,7 @@ func testChat(message string) {
 
 func addFakeHandles() {
 	for i := 0; i < 10; i++ {
-		h := Handle{
+		h := pb.Handle{
 			Name: fmt.Sprintf("test+%d", i),
 			Port: int32(i * 23),
 			Host: "fake IP",

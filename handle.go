@@ -8,9 +8,7 @@ import (
 )
 
 type Handle struct {
-	Name       string
-	Host       string
-	Port       int32
+	pb.Handle
 	Created_at time.Time
 }
 
@@ -23,15 +21,21 @@ type HandleSync struct {
 var ME pb.Handle
 var HANDLES HandleSync
 
-func (hs *HandleSync) Insert(h Handle) (err error) {
+func (hs *HandleSync) Insert(h pb.Handle) (err error) {
+	hs.Lock()
 	_, ok := hs.HandleMap[h.Name]
 	if !ok {
-		h.Created_at = time.Now()
-		hs.Lock()
-		hs.HandleMap[h.Name] = h
-		hs.Unlock()
+		hs.HandleMap[h.Name] = Handle{
+			Handle: pb.Handle{
+				Name: h.Name,
+				Port: h.Port,
+				Host: h.Host,
+			},
+			Created_at: time.Now(),
+		}
 		fmt.Println("New Handle Register for", h.Name)
 	}
+	hs.Unlock()
 	return nil
 }
 
@@ -48,11 +52,11 @@ func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
 	return
 }
 
-func (hs *HandleSync) Delete(h Handle) {
+func (hs *HandleSync) Delete(name string) {
 	hs.Lock()
-	delete(hs.HandleMap, h.Name)
+	delete(hs.HandleMap, name)
 	hs.Unlock()
-	fmt.Println("Handle Removed for", h.Name)
+	fmt.Println("Handle Removed for", name)
 }
 
 func (h Handle) String() string {
