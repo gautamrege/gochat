@@ -54,8 +54,8 @@ func main() {
 
 	h := pb.Handle{
 		Name: "Anuj",
-		Host: "192.168.1.18",
-		Port: int32(10000),
+		Host: "192.168.1.134",
+		Port: int32(8000),
 	}
 	sendChat(h, "wtf")
 
