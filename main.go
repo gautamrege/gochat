@@ -9,6 +9,7 @@ import (
 	"os"
 	"sync"
 	"time"
+	pb "github.com/gautamrege/gochat/api"
 )
 
 var (
