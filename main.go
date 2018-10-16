@@ -90,12 +90,12 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 }
 
 // isAlive go-routine that publishes it's Handle on 33333
-const listenerPort = 5000
-
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	var buffer bytes.Buffer
 
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
 	for {
 		select {
 		case <-exit:
@@ -114,8 +114,6 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			}
 
 			fmt.Println("Broadcast: ", handle)
-
-			encoder := gob.NewEncoder(&buffer)
 			encoder.Encode(handle)
 			conn.Write(buffer.Bytes())
 			buffer.Reset()
