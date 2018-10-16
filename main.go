@@ -51,13 +51,7 @@ func main() {
 	//	// When we need to exit, send true 3 times on exit channel!
 	//}
 	time.Sleep(1 * time.Second)
-
-	h := pb.Handle{
-		Name: "Anuj",
-		Host: "192.168.1.134",
-		Port: int32(8000),
-	}
-	sendChat(h, "wtf")
+	testChat()
 
 	// exit cleanly on waitgroup
 	wg.Wait()
@@ -126,4 +120,13 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 func cleanupDeadHandles(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and handle list
+}
+
+func testChat() {
+	h := pb.Handle{
+		Name: "Anuj",
+		Host: "192.168.1.18",
+		Port: int32(3000),
+	}
+	sendChat(h, "wtf")
 }
