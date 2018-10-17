@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"sync"
 	"time"
+
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 
 	pb "github.com/gautamrege/gochat/api"
 )
@@ -27,6 +28,7 @@ func (s *chatServer) Chat(ctx context.Context, req *pb.ChatRequest) (res *pb.Cha
 }
 
 // gRPC listener
+// - register and start grpc server
 func listen(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 

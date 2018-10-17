@@ -60,6 +60,7 @@ func main() {
 
 	var input string
 	for {
+		// Accept chat input
 		fmt.Printf("> ")
 		input = readInput()
 
@@ -67,14 +68,13 @@ func main() {
 		// Loop indefinitely and render Term
 		// When we need to exit, send true 3 times on exit channel!
 	}
-	//time.Sleep(1 * time.Second)
-	//testChat()
 
 	// exit cleanly on waitgroup
 	wg.Wait()
 	close(exit)
 }
 
+// Handle the input chat messages as well as help commands
 func parseAndExecInput(input string) {
 	helpStr := `/users :- Get list of live users
 @{user} message :- send message to specified user
@@ -125,11 +125,14 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 
 	handle := Handle{}
 	for {
-		localAddress, _ := net.ResolveUDPAddr("udp", "192.168.1.255:33333")
+		// listen to port 33333
+		localAddress, _ := net.ResolveUDPAddr("udp4", "192.168.1.255:33333")
 		connection, err := net.ListenUDP("udp", localAddress)
 		if err != nil {
 			fmt.Println(err)
 		}
+
+		// read the data and add to handlers. Igore the handle with same host
 		inputBytes := make([]byte, 4096)
 		length, _, _ := connection.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
@@ -139,6 +142,8 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 			//fmt.Println("listened data", handle)
 			HANDLES.Insert(handle.Handle)
 		}
+
+		// close the connection
 		connection.Close()
 	}
 }
@@ -149,6 +154,11 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
+	// broadcast on 33333 every 30 seconds with Handler
+	// - name
+	// - port
+	// - host
+	// - current timestamp
 	for {
 		select {
 		case <-exit:
@@ -168,7 +178,6 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 				Created_at: time.Now(),
 			}
 
-			//fmt.Println("Broadcast: ", handle)
 			encoder.Encode(handle)
 			conn.Write(buffer.Bytes())
 			buffer.Reset()
@@ -181,15 +190,6 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 func cleanupDeadHandles(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and handle list
-}
-
-func testChat(message string) {
-	h := pb.Handle{
-		Name: "Anuj",
-		Host: "192.168.1.18",
-		Port: int32(3000),
-	}
-	sendChat(h, message)
 }
 
 func addFakeHandles() {
