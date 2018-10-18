@@ -118,17 +118,6 @@ func cleanupDeadHandles(wg *sync.WaitGroup, exit chan bool) {
 	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and handle list
 }
 
-func addFakeHandles() {
-	for i := 0; i < 10; i++ {
-		h := pb.Handle{
-			Name: fmt.Sprintf("test+%d", i),
-			Port: int32(i * 23),
-			Host: "fake IP",
-		}
-		HANDLES.Insert(h)
-	}
-}
-
 func readInput() string {
 	reader := bufio.NewReader(os.Stdin)
 	text, _ := reader.ReadString('\n')
