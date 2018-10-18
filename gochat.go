@@ -17,7 +17,7 @@ type chatServer struct {
 }
 
 func (s *chatServer) Chat(ctx context.Context, req *pb.ChatRequest) (res *pb.ChatResponse, err error) {
-	fmt.Printf("\n%s\n>", fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
+	fmt.Printf("\n%s\n> ", fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
 
 	if _, ok := HANDLES.Get(req.From.Name); !ok {
 		// insert new user into HANDLES

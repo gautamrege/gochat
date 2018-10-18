@@ -33,7 +33,7 @@ func (hs *HandleSync) Insert(h pb.Handle) (err error) {
 			},
 			Created_at: time.Now(),
 		}
-		fmt.Printf("\nNew User joined the chat: @%s\n>", h.Name)
+		fmt.Printf("\nNew User joined the chat: @%s\n> ", h.Name)
 	}
 	hs.Unlock()
 	return nil
@@ -56,7 +56,7 @@ func (hs *HandleSync) Delete(name string) {
 	hs.Lock()
 	delete(hs.HandleMap, name)
 	hs.Unlock()
-	fmt.Println("Handle Removed for", name)
+	fmt.Printf("Handle Removed for %s\n> ", name)
 }
 
 func (h Handle) String() string {

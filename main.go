@@ -137,7 +137,7 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 		decoder := gob.NewDecoder(buffer)
 		decoder.Decode(&handle)
 		if handle.Host != *host {
-			//fmt.Println("listened data", handle)
+			//fmt.Println("listened data %s\n > ", handle)
 			HANDLES.Insert(handle.Handle)
 		}
 
@@ -190,7 +190,7 @@ func broadcastIsAlive() {
 	encoder.Encode(handle)
 	conn.Write(buffer.Bytes())
 	buffer.Reset()
-	fmt.Printf("isAlive %s\n> ", time.Now())
+	//fmt.Printf("isAlive %s\n> ", time.Now())
 	conn.Close()
 }
 
