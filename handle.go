@@ -24,15 +24,15 @@ var HANDLES HandleSync
 func (hs *HandleSync) Insert(h pb.Handle) (err error) {
 	hs.Lock()
 	_, ok := hs.HandleMap[h.Name]
+	hs.HandleMap[h.Name] = Handle{
+		Handle: pb.Handle{
+			Name: h.Name,
+			Port: h.Port,
+			Host: h.Host,
+		},
+		Created_at: time.Now(),
+	}
 	if !ok {
-		hs.HandleMap[h.Name] = Handle{
-			Handle: pb.Handle{
-				Name: h.Name,
-				Port: h.Port,
-				Host: h.Host,
-			},
-			Created_at: time.Now(),
-		}
 		fmt.Printf("\nNew User joined the chat: @%s\n> ", h.Name)
 	}
 	hs.Unlock()
@@ -56,7 +56,7 @@ func (hs *HandleSync) Delete(name string) {
 	hs.Lock()
 	delete(hs.HandleMap, name)
 	hs.Unlock()
-	fmt.Printf("Handle Removed for %s\n> ", name)
+	fmt.Println("Handle Removed for ", name)
 }
 
 func (h Handle) String() string {
