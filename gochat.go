@@ -76,5 +76,4 @@ func sendChat(h pb.Handle, message string) {
 		HANDLES.Delete(h.Name)
 	}
 	return
-
 }

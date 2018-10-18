@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/gautamrege/gochat/api"
 	"sync"
 	"time"
+
+	pb "github.com/gautamrege/gochat/api"
 )
 
 type Handle struct {
@@ -21,6 +22,8 @@ type HandleSync struct {
 var ME pb.Handle
 var HANDLES HandleSync
 
+// Insert handle if not exists
+// if existst then update the data
 func (hs *HandleSync) Insert(h pb.Handle) (err error) {
 	hs.Lock()
 	_, ok := hs.HandleMap[h.Name]
@@ -39,6 +42,7 @@ func (hs *HandleSync) Insert(h pb.Handle) (err error) {
 	return nil
 }
 
+// get the user details from the map with given name
 func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
 	hs.Lock()
 	tmp, ok := hs.HandleMap[name]
@@ -52,6 +56,7 @@ func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
 	return
 }
 
+// delete the user from map
 func (hs *HandleSync) Delete(name string) {
 	hs.Lock()
 	delete(hs.HandleMap, name)
