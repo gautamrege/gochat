@@ -73,6 +73,7 @@ func sendChat(h pb.Handle, message string) {
 	_, err = client.Chat(ctx, &req)
 	if err != nil {
 		log.Printf("ERROR: Chat(): %v", err)
+		HANDLES.Delete(h.Name)
 	}
 	return
 

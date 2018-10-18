@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 
 	if *name == "" || *host == "" {
-		fmt.Println("fuck off if you don't have a name and IP address :D")
+		fmt.Println("Usage: gochat --name <name> --host <IP Address> --port <port>")
 		os.Exit(1)
 	}
 	// Create your own Global Handle ME
@@ -55,8 +55,6 @@ func main() {
 		Host: *host,
 		Port: int32(*port),
 	}
-
-	//addFakeHandles()
 
 	var input string
 	for {
@@ -159,16 +157,17 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	// - port
 	// - host
 	// - current timestamp
+	ticker := time.NewTicker(time.Second * 10)
+	defer ticker.Stop()
 	for {
 		select {
 		case <-exit:
 			break
-		default:
+		case <-ticker.C:
 			conn, err := net.DialUDP("udp", nil, &net.UDPAddr{IP: []byte{192, 168, 1, 255}, Port: 33333})
 			if err != nil {
 				fmt.Println(err)
 			}
-			defer conn.Close()
 			handle := Handle{
 				Handle: pb.Handle{
 					Name: *name,
@@ -181,7 +180,8 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 			encoder.Encode(handle)
 			conn.Write(buffer.Bytes())
 			buffer.Reset()
-			time.Sleep(time.Second * 10)
+			fmt.Printf("isAlive %s\n> ", time.Now())
+			conn.Close()
 		}
 	}
 }
