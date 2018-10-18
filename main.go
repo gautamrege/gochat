@@ -150,13 +150,9 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 
-	var buffer bytes.Buffer
-	encoder := gob.NewEncoder(&buffer)
-	// broadcast on 33333 every 30 seconds with Handler
-	// - name
-	// - port
-	// - host
-	// - current timestamp
+	// Broadcast immediately at the start
+	broadcastIsAlive()
+
 	ticker := time.NewTicker(time.Second * 10)
 	defer ticker.Stop()
 	for {
@@ -164,26 +160,38 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 		case <-exit:
 			break
 		case <-ticker.C:
-			conn, err := net.DialUDP("udp", nil, &net.UDPAddr{IP: []byte{192, 168, 1, 255}, Port: 33333})
-			if err != nil {
-				fmt.Println(err)
-			}
-			handle := Handle{
-				Handle: pb.Handle{
-					Name: *name,
-					Port: int32(*port),
-					Host: *host,
-				},
-				Created_at: time.Now(),
-			}
-
-			encoder.Encode(handle)
-			conn.Write(buffer.Bytes())
-			buffer.Reset()
-			fmt.Printf("isAlive %s\n> ", time.Now())
-			conn.Close()
+			broadcastIsAlive()
 		}
 	}
+}
+
+// broadcast on 33333 every 30 seconds with Handler
+// - name
+// - port
+// - host
+// - current timestamp
+func broadcastIsAlive() {
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
+
+	conn, err := net.DialUDP("udp", nil, &net.UDPAddr{IP: []byte{192, 168, 1, 255}, Port: 33333})
+	if err != nil {
+		fmt.Println(err)
+	}
+	handle := Handle{
+		Handle: pb.Handle{
+			Name: *name,
+			Port: int32(*port),
+			Host: *host,
+		},
+		Created_at: time.Now(),
+	}
+
+	encoder.Encode(handle)
+	conn.Write(buffer.Bytes())
+	buffer.Reset()
+	fmt.Printf("isAlive %s\n> ", time.Now())
+	conn.Close()
 }
 
 // cleanup Dead Handlers
