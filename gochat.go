@@ -19,9 +19,9 @@ type chatServer struct {
 func (s *chatServer) Chat(ctx context.Context, req *pb.ChatRequest) (res *pb.ChatResponse, err error) {
 	fmt.Printf("\n%s\n> ", fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
 
-	if _, ok := HANDLES.Get(req.From.Name); !ok {
-		// insert new user into HANDLES
-		HANDLES.Insert(*(req.From))
+	if _, ok := USERS.Get(req.From.Name); !ok {
+		// insert new user into USERS
+		USERS.Insert(*(req.From))
 	}
 
 	return &pb.ChatResponse{}, nil
@@ -73,7 +73,7 @@ func sendChat(h pb.Handle, message string) {
 	_, err = client.Chat(ctx, &req)
 	if err != nil {
 		log.Printf("ERROR: Chat(): %v", err)
-		HANDLES.Delete(h.Name)
+		USERS.Delete(h.Name)
 	}
 	return
 }

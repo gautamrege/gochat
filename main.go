@@ -25,23 +25,23 @@ func main() {
 		fmt.Println("Usage: gochat --name <name> --host <IP Address> --port <port>")
 		os.Exit(1)
 	}
-	// Create your own Global Handle ME
+	// Create your own Global User ME
 	var wg sync.WaitGroup
 	wg.Add(4)
 
-	HANDLES.HandleMap = make(map[string]Handle)
+	USERS.UserMap = make(map[string]User)
 
 	// exit channel is a buffered channel for 5 exit patterns
 	exit := make(chan bool, 5)
 
 	// Listener for is-alive broadcasts from other hosts. Listening on 33333
-	go registerHandle(&wg, exit)
+	go registerUser(&wg, exit)
 
-	// Broadcast for is-alive on 33333 with own Handle.
+	// Broadcast for is-alive on 33333 with own User.
 	go isAlive(&wg, exit)
 
-	// Cleanup Dead Handles
-	go cleanupDeadHandles(&wg, exit)
+	// Cleanup Dead Users
+	go cleanupDeadUsers(&wg, exit)
 
 	// gRPC listener
 	go listen(&wg, exit)
@@ -87,7 +87,7 @@ func parseAndExecInput(input string) {
 \n`)
 		break
 	case strings.ToLower(cmd) == "/users":
-		fmt.Println(HANDLES)
+		fmt.Println(USERS)
 		break
 	case strings.ToLower(cmd) == "/exit":
 		os.Exit(1)
@@ -99,7 +99,7 @@ func parseAndExecInput(input string) {
 		}
 
 		// send message to particular user
-		if h, ok := HANDLES.Get(cmd[1:]); ok {
+		if h, ok := USERS.Get(cmd[1:]); ok {
 			sendChat(h, message)
 		} else {
 			fmt.Println("No user: ", cmd)
@@ -112,10 +112,10 @@ func parseAndExecInput(input string) {
 	}
 }
 
-// cleanup Dead Handlers
-func cleanupDeadHandles(wg *sync.WaitGroup, exit chan bool) {
+// cleanup Dead Userrs
+func cleanupDeadUsers(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
-	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and handle list
+	// wait for DEAD_HANDLE_INTERVAL seconds before removing them from chatrooms and user list
 }
 
 func readInput() string {

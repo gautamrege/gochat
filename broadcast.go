@@ -12,12 +12,12 @@ import (
 )
 
 // Broadcast Listener
-// Listens on 33333 and updates the Global Handles list
-func registerHandle(wg *sync.WaitGroup, exit chan bool) {
+// Listens on 33333 and updates the Global Users list
+func registerUser(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
-	// Check if the handle is already in HANDLES. If not, add a new one!
+	// Check if the user is already in USERS. If not, add a new one!
 
-	handle := Handle{}
+	user := User{}
 	for {
 		// listen to port 33333
 		localAddress, _ := net.ResolveUDPAddr("udp4", "192.168.1.255:33333")
@@ -26,15 +26,15 @@ func registerHandle(wg *sync.WaitGroup, exit chan bool) {
 			fmt.Println(err)
 		}
 
-		// read the data and add to handlers. Igore the handle with same host
+		// read the data and add to users. Igore the user with same host
 		inputBytes := make([]byte, 4096)
 		length, _, _ := connection.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
-		decoder.Decode(&handle)
-		if handle.Host != *host {
-			//fmt.Println("listened data %s\n > ", handle)
-			HANDLES.Insert(handle.Handle)
+		decoder.Decode(&user)
+		if user.Host != *host {
+			//fmt.Println("listened data %s\n > ", user)
+			USERS.Insert(user.Handle)
 		}
 
 		// close the connection
@@ -74,7 +74,7 @@ func broadcastIsAlive() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	handle := Handle{
+	user := User{
 		Handle: pb.Handle{
 			Name: *name,
 			Port: int32(*port),
@@ -83,7 +83,7 @@ func broadcastIsAlive() {
 		Created_at: time.Now(),
 	}
 
-	encoder.Encode(handle)
+	encoder.Encode(user)
 	conn.Write(buffer.Bytes())
 	buffer.Reset()
 	conn.Close()

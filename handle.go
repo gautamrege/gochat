@@ -8,26 +8,26 @@ import (
 	pb "github.com/gautamrege/gochat/api"
 )
 
-type Handle struct {
+type User struct {
 	pb.Handle
 	Created_at time.Time
 }
 
-// Ensure that handles are added / removed using a mutex!
-type HandleSync struct {
+// Ensure that users are added / removed using a mutex!
+type UserSync struct {
 	sync.RWMutex
-	HandleMap map[string]Handle
+	UserMap map[string]User
 }
 
 var ME pb.Handle
-var HANDLES HandleSync
+var USERS UserSync
 
-// Insert handle if not exists
+// Insert user if not exists
 // if existst then update the data
-func (hs *HandleSync) Insert(h pb.Handle) (err error) {
+func (hs *UserSync) Insert(h pb.Handle) (err error) {
 	hs.Lock()
-	_, ok := hs.HandleMap[h.Name]
-	hs.HandleMap[h.Name] = Handle{
+	_, ok := hs.UserMap[h.Name]
+	hs.UserMap[h.Name] = User{
 		Handle: pb.Handle{
 			Name: h.Name,
 			Port: h.Port,
@@ -43,9 +43,9 @@ func (hs *HandleSync) Insert(h pb.Handle) (err error) {
 }
 
 // get the user details from the map with given name
-func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
+func (hs *UserSync) Get(name string) (h pb.Handle, ok bool) {
 	hs.Lock()
-	tmp, ok := hs.HandleMap[name]
+	tmp, ok := hs.UserMap[name]
 	if ok {
 		h.Name = tmp.Name
 		h.Port = tmp.Port
@@ -57,20 +57,20 @@ func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
 }
 
 // delete the user from map
-func (hs *HandleSync) Delete(name string) {
+func (hs *UserSync) Delete(name string) {
 	hs.Lock()
-	delete(hs.HandleMap, name)
+	delete(hs.UserMap, name)
 	hs.Unlock()
-	fmt.Println("Handle Removed for ", name)
+	fmt.Println("User Removed for ", name)
 }
 
-func (h Handle) String() string {
+func (h User) String() string {
 	return fmt.Sprintf("%s@%s:%d", h.Name, h.Host, h.Port)
 }
 
-func (hs HandleSync) String() string {
+func (hs UserSync) String() string {
 	users := "\n"
-	for name, _ := range hs.HandleMap {
+	for name, _ := range hs.UserMap {
 		users = fmt.Sprintf("%s@%s\n", users, name)
 	}
 

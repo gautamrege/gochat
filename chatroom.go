@@ -5,14 +5,14 @@ import "sync"
 /* This is a chatroom that is registered on this server! */
 type Chatroom struct {
 	Name       string
-	People     []Handle
+	People     []User
 	ChatStream chan Chat
 }
 
 /* This is the message that is broadcast on the wire */
 type Chat struct {
-	From    Handle
-	To      Handle
+	From    User
+	To      User
 	Message string
 }
 
@@ -42,5 +42,5 @@ func (c *Chatroom) Print(chat Chat) {
 }
 
 func (c *Chatroom) Message(text string) {
-	// sends a message via gRPC to all the Handles in that chat-room
+	// sends a message via gRPC to all the User in that chat-room
 }
