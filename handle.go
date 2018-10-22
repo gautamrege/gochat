@@ -3,76 +3,52 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 
-	pb "github.com/gautamrege/gochat/api"
+	"github.com/gautamrege/gochat/api"
 )
 
-type User struct {
-	pb.Handle
-	Created_at time.Time
-}
-
 // Ensure that users are added / removed using a mutex!
-type UserSync struct {
+type PeerHandleMapSync struct {
 	sync.RWMutex
-	UserMap map[string]User
+	PeerHandleMap map[string]api.Handle
 }
 
-var ME pb.Handle
-var USERS UserSync
-
-// Insert user if not exists
-// if existst then update the data
-func (hs *UserSync) Insert(h pb.Handle) (err error) {
+// Insert user if not exists already then add it
+func (hs *PeerHandleMapSync) Insert(newHandle api.Handle) (err error) {
 	hs.Lock()
-	_, ok := hs.UserMap[h.Name]
-	hs.UserMap[h.Name] = User{
-		Handle: pb.Handle{
-			Name: h.Name,
-			Port: h.Port,
-			Host: h.Host,
-		},
-		Created_at: time.Now(),
-	}
+	_, ok := hs.PeerHandleMap[newHandle.Name]
 	if !ok {
-		fmt.Printf("\nNew User joined the chat: @%s\n> ", h.Name)
+		hs.PeerHandleMap[newHandle.Name] = newHandle
+		fmt.Printf("\nNew UserHandle joined the chat: @%s\n> ", newHandle.Name)
 	}
 	hs.Unlock()
 	return nil
 }
 
 // get the user details from the map with given name
-func (hs *UserSync) Get(name string) (h pb.Handle, ok bool) {
+func (hs *PeerHandleMapSync) Get(name string) (handle api.Handle, ok bool) {
 	hs.Lock()
-	tmp, ok := hs.UserMap[name]
-	if ok {
-		h.Name = tmp.Name
-		h.Port = tmp.Port
-		h.Host = tmp.Host
-	}
+	handle, ok = hs.PeerHandleMap[name]
 	hs.Unlock()
-
 	return
 }
 
 // delete the user from map
-func (hs *UserSync) Delete(name string) {
+func (hs *PeerHandleMapSync) Delete(name string) {
 	hs.Lock()
-	delete(hs.UserMap, name)
+	delete(hs.PeerHandleMap, name)
 	hs.Unlock()
-	fmt.Println("User Removed for ", name)
+	fmt.Println("UserHandle Removed for ", name)
 }
 
-func (h User) String() string {
+func String(h api.Handle) string {
 	return fmt.Sprintf("%s@%s:%d", h.Name, h.Host, h.Port)
 }
 
-func (hs UserSync) String() string {
+func (hs PeerHandleMapSync) String() string {
 	users := "\n"
-	for name, _ := range hs.UserMap {
+	for name, _ := range hs.PeerHandleMap {
 		users = fmt.Sprintf("%s@%s\n", users, name)
 	}
-
 	return users
 }
