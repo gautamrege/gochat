@@ -17,8 +17,11 @@ type PeerHandleMapSync struct {
 func (hs *PeerHandleMapSync) Insert(newHandle api.Handle) (err error) {
 	hs.Lock()
 	_, ok := hs.PeerHandleMap[newHandle.Name]
+
+	// Insert / update handle (consider the case where user restarts the process
+	// with the same handle but a different port!
+	hs.PeerHandleMap[newHandle.Name] = newHandle
 	if !ok {
-		hs.PeerHandleMap[newHandle.Name] = newHandle
 		fmt.Printf("\nNew UserHandle joined the chat: @%s\n> ", newHandle.Name)
 	}
 	hs.Unlock()
