@@ -11,3 +11,13 @@ binary that simulates a chatroom!
 * Channels and Go-routines should be used to manage each chatroom for public and private messaging!
 
 Innovate over this idea!
+
+## Learning from master branch
+
+There are 9 steps which are marked in the code `TODO-WORKSHOP-STEP-?` which need to be implemented in order. Implement them and have fun!
+
+
+## Contributing back
+
+Fork and submit PR
+
