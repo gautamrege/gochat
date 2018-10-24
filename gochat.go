@@ -6,74 +6,66 @@ import (
 	"net"
 	"sync"
 	"time"
-
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	pb "github.com/gautamrege/gochat/api"
+	"github.com/gautamrege/gochat/api"
 )
 
 type chatServer struct {
 }
 
-func (s *chatServer) Chat(ctx context.Context, req *pb.ChatRequest) (res *pb.ChatResponse, err error) {
+func (s *chatServer) Chat(ctx context.Context, req *api.ChatRequest) (res *api.ChatResponse, err error) {
 	fmt.Printf("\n%s\n> ", fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
 
 	if _, ok := USERS.Get(req.From.Name); !ok {
-		// insert new user into USERS
 		USERS.Insert(*(req.From))
 	}
-
-	return &pb.ChatResponse{}, nil
+	return &api.ChatResponse{}, nil
 }
 
-// gRPC listener
-// - register and start grpc server
-func listen(wg *sync.WaitGroup, exit chan bool) {
+// gRPC listener - register and start grpc server
+func listen(wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", *host, *port))
+	listener, err := net.Listen("tcp", fmt.Sprintf("%s:%d", MyHandle.Host, MyHandle.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterGoChatServer(grpcServer, &chatServer{})
+	api.RegisterGoChatServer(grpcServer, &chatServer{})
 
-	err = grpcServer.Serve(lis)
+	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
 
-func sendChat(h pb.Handle, message string) {
-	dest := fmt.Sprintf("%s:%d", h.Host, h.Port)
+func sendChat(toHandle api.Handle, message string) {
+	destStr := fmt.Sprintf("%s:%d", toHandle.Host, toHandle.Port)
 
-	conn, err := grpc.Dial(dest, grpc.WithInsecure())
+	conn, err := grpc.Dial(destStr, grpc.WithInsecure())
+	defer conn.Close()
 	if err != nil {
 		log.Fatalf("fail to dial: %v", err)
+		return
 	}
-	defer conn.Close()
 
-	client := pb.NewGoChatClient(conn)
-
+	client := api.NewGoChatClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	req := pb.ChatRequest{
-		To: &pb.Handle{
-			Name: h.Name,
-			Host: h.Host,
-			Port: h.Port,
-		},
-		From:    &ME,
+	req := api.ChatRequest{
+		To: &toHandle,
+		From:    &MyHandle,
 		Message: message,
 	}
 
 	_, err = client.Chat(ctx, &req)
 	if err != nil {
 		log.Printf("ERROR: Chat(): %v", err)
-		USERS.Delete(h.Name)
+		USERS.Delete(toHandle.Name)
 	}
 	return
 }
