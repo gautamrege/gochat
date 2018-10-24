@@ -41,7 +41,7 @@ func main() {
 	exit := make(chan bool, 1)
 
 	var wg sync.WaitGroup
-	wg.Add(1)
+	wg.Add(3)
 
 	// Listener for is-alive broadcasts from other hosts. Listening on 33333
 	go registerUser(&wg)
