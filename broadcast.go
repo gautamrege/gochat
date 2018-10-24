@@ -8,36 +8,36 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/gautamrege/gochat/api"
+	"github.com/gautamrege/gochat/api"
 )
 
-// Broadcast Listener
-// Listens on 33333 and updates the Global Handles list
-func registerHandle(wg *sync.WaitGroup, exit chan bool) {
-	defer wg.Done()
-	// Check if the handle is already in HANDLES. If not, add a new one!
+const broadcastAddress = "172.18.255.255:33333"
 
-	handle := Handle{}
+// Broadcast Listener , Listens on 33333 and updates the Global Users list
+func registerUser(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	var user api.Handle
 	for {
 		// listen to port 33333
-		localAddress, _ := net.ResolveUDPAddr("udp4", "192.168.1.255:33333")
+		localAddress, _ := net.ResolveUDPAddr("udp4", broadcastAddress)
 		connection, err := net.ListenUDP("udp", localAddress)
 		if err != nil {
 			fmt.Println(err)
 		}
 
-		// read the data and add to handlers. Igore the handle with same host
+		// read the data and add to users.
 		inputBytes := make([]byte, 4096)
 		length, _, _ := connection.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
-		decoder.Decode(&handle)
-		if handle.Host != *host {
-			//fmt.Println("listened data %s\n > ", handle)
-			HANDLES.Insert(handle.Handle)
+		decoder.Decode(&user)
+
+		// Ignore the user with same host
+		if user.Host != MyHandle.Host {
+			USERS.Insert(user)
 		}
 
-		// close the connection
 		connection.Close()
 	}
 }
@@ -61,11 +61,7 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 	}
 }
 
-// broadcast on 33333 every 30 seconds with Handler
-// - name
-// - port
-// - host
-// - current timestamp
+// broadcast on 33333 every 30 seconds with MyHandle(own) Handler
 func broadcastIsAlive() {
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
@@ -73,17 +69,10 @@ func broadcastIsAlive() {
 	conn, err := net.DialUDP("udp", nil, &net.UDPAddr{IP: []byte{192, 168, 1, 255}, Port: 33333})
 	if err != nil {
 		fmt.Println(err)
-	}
-	handle := Handle{
-		Handle: pb.Handle{
-			Name: *name,
-			Port: int32(*port),
-			Host: *host,
-		},
-		Created_at: time.Now(),
+		return
 	}
 
-	encoder.Encode(handle)
+	encoder.Encode(MyHandle)
 	conn.Write(buffer.Bytes())
 	buffer.Reset()
 	conn.Close()

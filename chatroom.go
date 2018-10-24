@@ -1,18 +1,22 @@
 package main
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/gautamrege/gochat/api"
+)
 
 /* This is a chatroom that is registered on this server! */
 type Chatroom struct {
 	Name       string
-	People     []Handle
+	People     []api.Handle
 	ChatStream chan Chat
 }
 
 /* This is the message that is broadcast on the wire */
 type Chat struct {
-	From    Handle
-	To      Handle
+	From    api.Handle
+	To      api.Handle
 	Message string
 }
 
@@ -42,5 +46,5 @@ func (c *Chatroom) Print(chat Chat) {
 }
 
 func (c *Chatroom) Message(text string) {
-	// sends a message via gRPC to all the Handles in that chat-room
+	// sends a message via gRPC to all the UserHandle in that chat-room
 }

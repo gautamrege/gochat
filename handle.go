@@ -3,67 +3,49 @@ package main
 import (
 	"fmt"
 	"sync"
-	"time"
 
-	pb "github.com/gautamrege/gochat/api"
+	"github.com/gautamrege/gochat/api"
 )
 
-/**** This is the pb.Handle struct
- THIS IS FOR REFERENCE ONLY. DO NOT UNCOMMENT
- type pb.Handle struct {
-	 Name string
-	 Host string
-	 Port int32
- }
-****/
-type Handle struct {
-	pb.Handle
-	Created_at time.Time
-}
-
-// Ensure that handles are added / removed using a mutex!
-type HandleSync struct {
+// Ensure that users are added / removed using a mutex!
+type PeerHandleMapSync struct {
 	sync.RWMutex
-	HandleMap map[string]Handle
+	PeerHandleMap map[string]api.Handle
 }
 
-var ME pb.Handle
-var HANDLES HandleSync
-
-// Insert handle if not exists
-// if existst then update the data
-func (hs *HandleSync) Insert(h pb.Handle) (err error) {
+// Insert user if not exists already then add it
+func (hs *PeerHandleMapSync) Insert(newHandle api.Handle) (err error) {
 	hs.Lock()
-	// TODO-WORKSHOP: This code should insert the handle into the HandleMap
+	// TODO-WORKSHOP-STEP-3: This code should insert the handle into the HandleMap
 	hs.Unlock()
 	return nil
 }
 
 // get the user details from the map with given name
-func (hs *HandleSync) Get(name string) (h pb.Handle, ok bool) {
+func (hs *PeerHandleMapSync) Get(name string) (handle api.Handle, ok bool) {
 	hs.Lock()
-	// TODO-WORKSHOP: This code should fetch the handle from the HandleMap based on the key name
+	// TODO-WORKSHOP-STEP-4: This code should fetch the handle from the HandleMap based on the key name
 	// TODO-THINK: Why is this in a Lock() method?
 	hs.Unlock()
-
 	return
 }
 
 // delete the user from map
-func (hs *HandleSync) Delete(name string) {
+func (hs *PeerHandleMapSync) Delete(name string) {
 	hs.Lock()
-	// TODO-WORKSHOP: This code should remove the handle from the HandleMap based on the key name
+	// TODO-WORKSHOP-STEP-5: This code should remove the handle from the HandleMap based on the key name
 	hs.Unlock()
-	fmt.Println("Handle Removed for ", name)
+	fmt.Println("UserHandle Removed for ", name)
 }
 
-func (h Handle) String() string {
+func String(h api.Handle) string {
 	return fmt.Sprintf("%s@%s:%d", h.Name, h.Host, h.Port)
 }
 
-func (hs HandleSync) String() (users string) {
-	// TODO-WORKSHOP: This code should print the list of all names of the handles in the map
+func (hs PeerHandleMapSync) String() string {
+	var users string
+	// TODO-WORKSHOP-STEP-6: This code should print the list of all names of the handles in the map
 	// TODO-THINK: Do we need a Lock here?
 
-	return
+	return users
 }
