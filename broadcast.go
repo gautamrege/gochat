@@ -11,7 +11,8 @@ import (
 	"github.com/gautamrege/gochat/api"
 )
 
-const broadcastAddress = "172.18.255.255:33333"
+//Edit: Local Network broadcast address
+const broadcastAddress = "192.168.1.255:33333"
 
 // Broadcast Listener , Listens on 33333 and updates the Global Users list
 func registerUser(wg *sync.WaitGroup) {
@@ -66,7 +67,7 @@ func broadcastIsAlive() {
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
 
-	conn, err := net.DialUDP("udp", nil, &net.UDPAddr{IP: []byte{192, 168, 1, 255}, Port: 33333})
+	conn, err := net.Dial("udp", broadcastAddress)
 	if err != nil {
 		fmt.Println(err)
 		return
