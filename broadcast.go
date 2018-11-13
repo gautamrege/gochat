@@ -21,7 +21,7 @@ func registerUser(wg *sync.WaitGroup) {
 	var user api.Handle
 	for {
 		// listen to port 33333
-		localAddress, _ := net.ResolveUDPAddr("udp4", broadcastAddress)
+		localAddress, _ := net.ResolveUDPAddr("udp4", MyHandle.Broadcastaddress)
 		connection, err := net.ListenUDP("udp", localAddress)
 		if err != nil {
 			fmt.Println(err)
@@ -33,8 +33,7 @@ func registerUser(wg *sync.WaitGroup) {
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
 		decoder.Decode(&user)
-
-		// Ignore the user with same host
+		//Ignore the user with same host
 		if user.Host != MyHandle.Host {
 			USERS.Insert(user)
 		}
@@ -66,8 +65,7 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 func broadcastIsAlive() {
 	var buffer bytes.Buffer
 	encoder := gob.NewEncoder(&buffer)
-
-	conn, err := net.Dial("udp", broadcastAddress)
+	conn, err := net.Dial("udp", MyHandle.Broadcastaddress)
 	if err != nil {
 		fmt.Println(err)
 		return

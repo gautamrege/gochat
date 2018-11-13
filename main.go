@@ -9,6 +9,8 @@ import (
 	"sync"
 
 	"github.com/gautamrege/gochat/api"
+	"net"
+	"log"
 )
 
 const helpStr = `Commands
@@ -16,6 +18,8 @@ const helpStr = `Commands
 2. @{user} message :- send message to specified user
 3. /exit :- Exit the Chat
 4. /all :- Send message to all the users [TODO]`
+
+const broadcastPort  = "33333"
 
 var (
 	name = flag.String("name", "", "The name you want to chat as")
@@ -37,11 +41,12 @@ func main() {
 		fmt.Println("Usage: gochat --name <name> --host <IP Address> --port <port>")
 		os.Exit(1)
 	}
-
+	outBoundAddress := GetBroadcastIP()+":"+broadcastPort
 	MyHandle = api.Handle{
 		Name: *name,
 		Host: *host,
 		Port: int32(*port),
+		Broadcastaddress:outBoundAddress,
 	}
 
 	var wg sync.WaitGroup
@@ -69,6 +74,18 @@ func main() {
 
 	wg.Wait()
 	close(exit)
+}
+
+// Get Broadcast Ip address
+func GetBroadcastIP() string {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP.String()
 }
 
 // Handle the input chat messages as well as help commands
