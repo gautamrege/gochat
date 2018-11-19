@@ -29,6 +29,8 @@ var USERS = PeerHandleMapSync{
 	PeerHandleMap: make(map[string]api.Handle),
 }
 
+//exit channel is not used
+
 func main() {
 	// Parse flags for host, port and name
 	flag.Parse()
@@ -43,14 +45,14 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(3)
 
-	// Listener for is-alive broadcasts from other hosts. Listening on 33333
-	go registerUser(&wg)
-
 	// Broadcast for is-alive on 33333 with own UserHandle.
-	go isAlive(&wg, exit)
+	go broadcastOwnHandle(&wg, exit)
+
+	// Listener for is-alive broadcasts from other hosts. Listening on 33333
+	go listenAndRegisterUsers(&wg)
 
 	// gRPC listener
-	go listen(&wg)
+	go startServer(&wg)
 
 	for {
 		fmt.Printf("> ")

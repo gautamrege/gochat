@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
+	"log"
 	"net"
 	"sync"
 	"time"
@@ -15,21 +15,21 @@ import (
 const broadcastAddress = "192.168.1.255:33333"
 
 // Broadcast Listener , Listens on 33333 and updates the Global Users list
-func registerUser(wg *sync.WaitGroup) {
+func listenAndRegisterUsers(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	var user api.Handle
 	for {
-		// listen to port 33333
-		localAddress, _ := net.ResolveUDPAddr("udp4", broadcastAddress)
-		connection, err := net.ListenUDP("udp", localAddress)
+		// startServer to port 33333
+		udpAddress, _ := net.ResolveUDPAddr("udp4", broadcastAddress)
+		udpConn, err := net.ListenUDP("udp", udpAddress)
 		if err != nil {
-			fmt.Println(err)
+			log.Print(err)
 		}
 
 		// read the data and add to users.
 		inputBytes := make([]byte, 4096)
-		length, _, _ := connection.ReadFromUDP(inputBytes)
+		length, _, _ := udpConn.ReadFromUDP(inputBytes)
 		buffer := bytes.NewBuffer(inputBytes[:length])
 		decoder := gob.NewDecoder(buffer)
 		decoder.Decode(&user)
@@ -39,12 +39,12 @@ func registerUser(wg *sync.WaitGroup) {
 			USERS.Insert(user)
 		}
 
-		connection.Close()
+		udpConn.Close()
 	}
 }
 
-// isAlive go-routine that publishes it's Handle on 33333
-func isAlive(wg *sync.WaitGroup, exit chan bool) {
+// broadcastOwnHandle go-routine that publishes it's Handle on 33333
+func broadcastOwnHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer wg.Done()
 
 	// Broadcast immediately at the start
@@ -64,17 +64,16 @@ func isAlive(wg *sync.WaitGroup, exit chan bool) {
 
 // broadcast on 33333 every 30 seconds with MyHandle(own) Handler
 func broadcastIsAlive() {
-	var buffer bytes.Buffer
-	encoder := gob.NewEncoder(&buffer)
-
 	conn, err := net.Dial("udp", broadcastAddress)
+	defer conn.Close()
 	if err != nil {
-		fmt.Println(err)
+		log.Print(err)
 		return
 	}
 
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
 	encoder.Encode(MyHandle)
 	conn.Write(buffer.Bytes())
 	buffer.Reset()
-	conn.Close()
 }
