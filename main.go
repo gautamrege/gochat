@@ -29,8 +29,6 @@ var USERS = PeerHandleMapSync{
 	PeerHandleMap: make(map[string]api.Handle),
 }
 
-//exit channel is not used
-
 func main() {
 	// Parse flags for host, port and name
 	flag.Parse()
@@ -39,14 +37,11 @@ func main() {
 
 	// TODO-WORKSHOP-STEP-2: Initialize global ME of type pb.Handle
 
-	// exit channel is a buffered channel for 5 exit patterns
-	exit := make(chan bool, 1)
-
 	var wg sync.WaitGroup
 	wg.Add(3)
 
 	// Broadcast for is-alive on 33333 with own UserHandle.
-	go broadcastOwnHandle(&wg, exit)
+	go broadcastOwnHandle(&wg)
 
 	// Listener for is-alive broadcasts from other hosts. Listening on 33333
 	go listenAndRegisterUsers(&wg)
@@ -63,7 +58,6 @@ func main() {
 	}
 
 	wg.Wait()
-	close(exit)
 }
 
 // Handle the input chat messages as well as help commands

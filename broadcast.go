@@ -44,7 +44,7 @@ func listenAndRegisterUsers(wg *sync.WaitGroup) {
 }
 
 // broadcastOwnHandle go-routine that publishes it's Handle on 33333
-func broadcastOwnHandle(wg *sync.WaitGroup, exit chan bool) {
+func broadcastOwnHandle(wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	// Broadcast immediately at the start
@@ -54,8 +54,6 @@ func broadcastOwnHandle(wg *sync.WaitGroup, exit chan bool) {
 	defer ticker.Stop()
 	for {
 		select {
-		case <-exit:
-			break
 		case <-ticker.C:
 			broadcastIsAlive()
 		}
