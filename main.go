@@ -35,7 +35,7 @@ func main() {
 
 	// TODO-WORKSHOP-STEP-1: If the name and host are empty, return an error with help message
 
-	// TODO-WORKSHOP-STEP-2: Initialize global ME of type pb.Handle
+	// TODO-WORKSHOP-STEP-2: Initialize global MyHandle of type api.Handle
 
 	var wg sync.WaitGroup
 	wg.Add(3)

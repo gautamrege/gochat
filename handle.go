@@ -16,7 +16,7 @@ type PeerHandleMapSync struct {
 // Insert user if not exists already then add it
 func (hs *PeerHandleMapSync) Insert(newHandle api.Handle) (err error) {
 	hs.Lock()
-	// TODO-WORKSHOP-STEP-3: This code should insert the handle into the HandleMap
+	// TODO-WORKSHOP-STEP-3: This code should insert the handle into the PeerHandleMap
 	hs.Unlock()
 	return nil
 }
@@ -24,7 +24,7 @@ func (hs *PeerHandleMapSync) Insert(newHandle api.Handle) (err error) {
 // get the user details from the map with given name
 func (hs *PeerHandleMapSync) Get(name string) (handle api.Handle, ok bool) {
 	hs.Lock()
-	// TODO-WORKSHOP-STEP-4: This code should fetch the handle from the HandleMap based on the key name
+	// TODO-WORKSHOP-STEP-4: This code should fetch the handle from the PeerHandleMap based on the key name
 	// TODO-THINK: Why is this in a Lock() method?
 	hs.Unlock()
 	return
@@ -33,7 +33,7 @@ func (hs *PeerHandleMapSync) Get(name string) (handle api.Handle, ok bool) {
 // delete the user from map
 func (hs *PeerHandleMapSync) Delete(name string) {
 	hs.Lock()
-	// TODO-WORKSHOP-STEP-5: This code should remove the handle from the HandleMap based on the key name
+	// TODO-WORKSHOP-STEP-5: This code should remove the handle from the PeerHandleMap based on the key name
 	hs.Unlock()
 	fmt.Println("UserHandle Removed for ", name)
 }
