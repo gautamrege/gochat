@@ -60,7 +60,7 @@ func broadcastOwnHandle(wg *sync.WaitGroup) {
 	}
 }
 
-// broadcast on 33333 every 30 seconds with MyHandle(own) Handler
+// broadcast on 33333 every 10 seconds with MyHandle(own) Handler
 func broadcastIsAlive() {
 	conn, err := net.Dial("udp", broadcastAddress)
 	defer conn.Close()

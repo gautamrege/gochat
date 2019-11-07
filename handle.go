@@ -16,7 +16,7 @@ type PeerHandleMapSync struct {
 // Insert user if not exists already then add it
 func (hs *PeerHandleMapSync) Insert(newHandle api.Handle) (err error) {
 	hs.Lock()
-	// TODO-WORKSHOP-STEP-3: This code should insert the handle into the PeerHandleMap
+	// TODO-WORKSHOP-STEP-3: This code should insert the newHandle into the PeerHandleMap
 	hs.Unlock()
 	return nil
 }
@@ -44,7 +44,7 @@ func String(h api.Handle) string {
 
 func (hs PeerHandleMapSync) String() string {
 	var users string
-	// TODO-WORKSHOP-STEP-6: This code should print the list of all names of the handles in the map
+	// TODO-WORKSHOP-STEP-6: This code should print the list of all names of the handles in the PeerHandleMap
 	// TODO-THINK: Do we need a Lock here?
 
 	return users
