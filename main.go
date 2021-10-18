@@ -36,6 +36,11 @@ func main() {
 	// TODO-WORKSHOP-STEP-1: If the name and host are empty, return an error with help message
 
 	// TODO-WORKSHOP-STEP-2: Initialize global MyHandle of type api.Handle
+	MyHandle = api.Handle{
+		Name: *name,
+		Host: *host,
+		Port: int32(*port),
+	}
 
 	var wg sync.WaitGroup
 	wg.Add(3)
@@ -57,7 +62,7 @@ func main() {
 		parseAndExecInput(textInput)
 	}
 
-	wg.Wait()
+	//wg.Wait()
 }
 
 // Handle the input chat messages as well as help commands
@@ -73,7 +78,7 @@ func parseAndExecInput(input string) {
 		fmt.Printf(helpStr)
 		break
 	case strings.ToLower(cmd) == "/users":
-		fmt.Println(USERS)
+		fmt.Println(USERS.String())
 		break
 	case strings.ToLower(cmd) == "/exit":
 		os.Exit(1)
@@ -82,6 +87,12 @@ func parseAndExecInput(input string) {
 		// TODO-WORKSHOP-STEP-9: Write code to sendChat. Example
 		// "@gautam hello golang" should send a message to handle with name "gautam" and message "hello golang"
 		// Invoke sendChat to send the  message
+		recvHandle, ok := USERS.Get(cmd[1:len(cmd)])
+		if !ok {
+			fmt.Printf("No such user: %s", cmd)
+		}
+
+		sendChat(recvHandle, tokens[1])
 		break
 	case strings.ToLower(cmd) == "/help":
 		fmt.Println(helpStr)

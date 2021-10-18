@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gautamrege/gochat/api"
-	"google.golang.org/grpc"
 	"log"
 	"time"
+
+	"github.com/gautamrege/gochat/api"
+	"google.golang.org/grpc"
 )
 
 func sendChat(receiverHandle api.Handle, message string) {
@@ -34,6 +35,9 @@ func sendChat(receiverHandle api.Handle, message string) {
 
 	var req api.ChatRequest
 	// TODO-WORKSHOP-STEP-8: Create req struct of type api.ChatRequest to send to client.Chat method
+	req.From = &MyHandle
+	req.To = &receiverHandle
+	req.Message = message
 
 	_, err = chatClient.Chat(ctx, &req)
 	if err != nil {
