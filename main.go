@@ -29,6 +29,14 @@ var USERS = PeerHandleMapSync{
 	PeerHandleMap: make(map[string]api.Handle),
 }
 
+var TERM = TermChat{}
+var WS = WsChat{}
+
+type Chatter interface {
+	Input() (string, error)
+	Render(string) error
+}
+
 func main() {
 	// Parse flags for host, port and name
 	flag.Parse()
@@ -54,19 +62,24 @@ func main() {
 	// gRPC listener
 	go startServer(&wg)
 
+	// WebSocket listener
+	go WSRun()
+
+	// Term ChatRoom
 	for {
-		fmt.Printf("> ")
-		textInput, _ := stdReader.ReadString('\n')
-		// convert CRLF to LF
-		textInput = strings.Replace(textInput, "\n", "", -1)
-		parseAndExecInput(textInput)
+		textInput, err := TERM.Input()
+		if err != nil {
+			TERM.Render("Unable to get input.. exiting!")
+			os.Exit(1) // ??
+		}
+		parseAndExecInput(&TERM, textInput)
 	}
 
 	//wg.Wait()
 }
 
 // Handle the input chat messages as well as help commands
-func parseAndExecInput(input string) {
+func parseAndExecInput(chat Chatter, input string) {
 	// Split the line into 2 tokens (cmd and message)
 	tokens := strings.SplitN(input, " ", 2)
 	cmd := tokens[0]
@@ -75,10 +88,10 @@ func parseAndExecInput(input string) {
 	case cmd == "":
 		break
 	case cmd == "?":
-		fmt.Printf(helpStr)
+		chat.Render(helpStr)
 		break
 	case strings.ToLower(cmd) == "/users":
-		fmt.Println(USERS.String())
+		chat.Render(USERS.String())
 		break
 	case strings.ToLower(cmd) == "/exit":
 		os.Exit(1)
@@ -89,15 +102,16 @@ func parseAndExecInput(input string) {
 		// Invoke sendChat to send the  message
 		recvHandle, ok := USERS.Get(cmd[1:len(cmd)])
 		if !ok {
-			fmt.Printf("No such user: %s", cmd)
+			chat.Render(fmt.Sprintf("No such user: %s", cmd))
+			break
 		}
 
 		sendChat(recvHandle, tokens[1])
 		break
 	case strings.ToLower(cmd) == "/help":
-		fmt.Println(helpStr)
+		chat.Render(helpStr)
 		break
 	default:
-		fmt.Println(helpStr)
+		chat.Render(helpStr)
 	}
 }
