@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func sendChat(receiverHandle api.Handle, message string) {
+func sendChat(receiverHandle api.Handle, source, message string) {
 	receiverConnStr := fmt.Sprintf("%s:%d", receiverHandle.Host, receiverHandle.Port)
 
 	receiverConn, err := grpc.Dial(receiverConnStr, grpc.WithInsecure())
@@ -38,6 +38,7 @@ func sendChat(receiverHandle api.Handle, message string) {
 	req.From = &MyHandle
 	req.To = &receiverHandle
 	req.Message = message
+	req.Source = source
 
 	_, err = chatClient.Chat(ctx, &req)
 	if err != nil {

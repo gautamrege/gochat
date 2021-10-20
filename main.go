@@ -72,14 +72,14 @@ func main() {
 			TERM.Render("Unable to get input.. exiting!")
 			os.Exit(1) // ??
 		}
-		parseAndExecInput(&TERM, textInput)
+		parseAndExecInput(&TERM, "term", textInput)
 	}
 
 	//wg.Wait()
 }
 
 // Handle the input chat messages as well as help commands
-func parseAndExecInput(chat Chatter, input string) {
+func parseAndExecInput(chat Chatter, source, input string) {
 	// Split the line into 2 tokens (cmd and message)
 	tokens := strings.SplitN(input, " ", 2)
 	cmd := tokens[0]
@@ -106,7 +106,7 @@ func parseAndExecInput(chat Chatter, input string) {
 			break
 		}
 
-		sendChat(recvHandle, tokens[1])
+		sendChat(recvHandle, source, tokens[1])
 		break
 	case strings.ToLower(cmd) == "/help":
 		chat.Render(helpStr)

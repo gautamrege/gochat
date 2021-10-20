@@ -17,8 +17,11 @@ type chatServer struct {
 
 func (s *chatServer) Chat(ctx context.Context, req *api.ChatRequest) (res *api.ChatResponse, err error) {
 	//fmt.Printf("\n%s\n> ", fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
-	TERM.Render(req.Message)
-	WS.Render(req.Message)
+	if req.Source == "term" {
+		TERM.Render(req.Message)
+	} else if req.Source == "ws" {
+		WS.Render(req.Message)
+	}
 
 	// TODO-WORKSHOP-STEP-7: If this is a chat from an unknown user, insert into PeerHandleMap
 	if _, ok := USERS.Get(req.From.Name); !ok {

@@ -50,7 +50,7 @@ func StartWsChat(w http.ResponseWriter, r *http.Request) {
 			WS.Render("Unable to get input.. exiting!")
 			break
 		}
-		parseAndExecInput(&WS, textInput)
+		parseAndExecInput(&WS, "ws", textInput)
 	}
 }
 
