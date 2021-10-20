@@ -15,6 +15,7 @@ message ChatRequest {
   Handle from = 1;
   Handle to = 2;
   string message = 3;
+  string source = 4;
 }
 
 message ChatResponse {
