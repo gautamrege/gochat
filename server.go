@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/gautamrege/gochat/api"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"sync"
+
+	"github.com/gautamrege/gochat/api"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 type chatServer struct {
+	api.UnimplementedGoChatServer
 }
 
 func (s *chatServer) Chat(ctx context.Context, req *api.ChatRequest) (res *api.ChatResponse, err error) {
