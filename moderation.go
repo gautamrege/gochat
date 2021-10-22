@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strings"
@@ -36,7 +37,20 @@ func moderateChat(quit chan bool) {
 
 			if flagAbuse && req.Source == "ws" {
 				// TODO: Handle abuse rendering
-				WS.Render(fmt.Sprintf("Abuse: %s", req.Message))
+				abuse := struct {
+					Chatid string `json:"chatid"`
+					Abuse  bool   `json:"abuse"`
+				}{
+					req.Chatid, true,
+				}
+
+				message, err := json.Marshal(abuse)
+				if err != nil {
+					fmt.Println("Unable to marshal chat request: ", err)
+					return
+				}
+
+				WS.Render(string(message))
 			}
 
 		}

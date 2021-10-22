@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/rand"
@@ -57,6 +58,16 @@ func sendChat(receiverHandle api.Handle, source, message string) {
 	if err != nil {
 		log.Printf("ERROR: Chat(): %v", err)
 		USERS.Delete(receiverHandle.Name)
+	}
+
+	// Update own terminal if it's a WebSocket
+	if req.Source == "ws" {
+		message, err := json.Marshal(req)
+		if err != nil {
+			fmt.Println("Unable to marshal chat request: ", err)
+			return
+		}
+		WS.Render(string(message))
 	}
 	return
 }

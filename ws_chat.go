@@ -84,14 +84,21 @@ window.addEventListener("load", function(evt) {
 
     ws = new WebSocket("{{.}}");
     ws.onmessage = function(evt) {
-        print(evt.data);
+	const data = JSON.parse(evt.data);
+        print(data)
     }
 
-    var print = function(message) {
-        var d = document.createElement("div");
-        d.textContent = message;
-        output.appendChild(d);
-        output.scroll(0, output.scrollHeight);
+    var print = function(data) {
+	if (data.abuse) {
+	    var d = document.getElementById(data.chatid);
+	    d.style.color = 'red';
+	} else {
+            var d = document.createElement("div");
+            d.id = data.chatid;
+	    d.textContent = "@" + data.from.name + ": " + data.message;
+            output.appendChild(d);
+            output.scroll(0, output.scrollHeight);
+	}
     };
 
     document.getElementById("send").onclick = function(evt) {
