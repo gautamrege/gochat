@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -16,11 +17,19 @@ type chatServer struct {
 }
 
 func (s *chatServer) Chat(ctx context.Context, req *api.ChatRequest) (res *api.ChatResponse, err error) {
-	//fmt.Printf("\n%s\n> ", fmt.Sprintf("@%s says: \"%s\"", req.From.Name, req.Message))
+
+	message, err := json.Marshal(req)
+	if err != nil {
+		fmt.Println("Unable to marshal chat request: ", err)
+		return nil, err
+	}
+
 	if req.Source == "term" {
-		TERM.Render(req.Message)
+		TERM.Render(string(message))
+		TERM.Moderate(*req)
 	} else if req.Source == "ws" {
-		WS.Render(req.Message)
+		WS.Render(string(message))
+		WS.Moderate(*req)
 	}
 
 	// TODO-WORKSHOP-STEP-7: If this is a chat from an unknown user, insert into PeerHandleMap

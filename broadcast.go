@@ -14,7 +14,7 @@ import (
 //Edit: Local Network broadcast address
 //const broadcastAddress = "192.168.0.255:33333"
 
-const broadcastAddress = "192.168.3.255:3333"
+const broadcastAddress = "192.168.3.255:33333"
 
 // Broadcast Listener , Listens on 33333 and updates the Global Users list
 func listenAndRegisterUsers(wg *sync.WaitGroup) {

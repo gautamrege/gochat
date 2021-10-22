@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 
+	"github.com/gautamrege/gochat/api"
 	"github.com/gorilla/websocket"
 )
 
@@ -25,12 +25,17 @@ func (ws *WsChat) Input() (string, error) {
 }
 
 func (ws *WsChat) Render(message string) error {
-	err := ws.conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("@%s: %s", MyHandle.Name, message)))
+	err := ws.conn.WriteMessage(websocket.TextMessage, []byte(message))
 	if err != nil {
 		log.Println("write:", err)
 		return err
 	}
 	return nil
+}
+
+func (ws *WsChat) Moderate(req api.ChatRequest) {
+	Moderation <- req
+	return
 }
 
 func StartWsChat(w http.ResponseWriter, r *http.Request) {

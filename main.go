@@ -35,6 +35,7 @@ var WS = WsChat{}
 type Chatter interface {
 	Input() (string, error)
 	Render(string) error
+	Moderate(api.ChatRequest)
 }
 
 func main() {
@@ -49,6 +50,8 @@ func main() {
 		Host: *host,
 		Port: int32(*port),
 	}
+
+	quit := make(chan bool)
 
 	var wg sync.WaitGroup
 	wg.Add(3)
@@ -65,6 +68,9 @@ func main() {
 	// WebSocket listener
 	go WSRun()
 
+	// Moderate chat
+	go moderateChat(quit)
+
 	// Term ChatRoom
 	for {
 		textInput, err := TERM.Input()
@@ -74,8 +80,6 @@ func main() {
 		}
 		parseAndExecInput(&TERM, "term", textInput)
 	}
-
-	//wg.Wait()
 }
 
 // Handle the input chat messages as well as help commands

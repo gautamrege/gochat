@@ -4,11 +4,23 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/gautamrege/gochat/api"
 	"google.golang.org/grpc"
 )
+
+func generate_uuid() string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+	rand.Seed(time.Now().UnixNano())
+
+	b := make([]rune, 10)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
 
 func sendChat(receiverHandle api.Handle, source, message string) {
 	receiverConnStr := fmt.Sprintf("%s:%d", receiverHandle.Host, receiverHandle.Port)
@@ -39,6 +51,7 @@ func sendChat(receiverHandle api.Handle, source, message string) {
 	req.To = &receiverHandle
 	req.Message = message
 	req.Source = source
+	req.Chatid = generate_uuid()
 
 	_, err = chatClient.Chat(ctx, &req)
 	if err != nil {
