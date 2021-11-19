@@ -21,6 +21,7 @@ var (
 	name      = flag.String("name", "", "The name you want to chat as")
 	port      = flag.Int("port", 12345, "Port that your server will run on.")
 	host      = flag.String("host", "", "Host IP that your server is running on.")
+	preload   = flag.Bool("preload", false, "Preload users from users.json")
 	stdReader = bufio.NewReader(os.Stdin)
 )
 
@@ -53,11 +54,15 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(3)
 
-	// Broadcast for is-alive on 33333 with own UserHandle.
-	go broadcastOwnHandle(&wg)
+	if *preload {
+		preloadUsers()
+	} else {
+		// Broadcast for is-alive on 33333 with own UserHandle.
+		go broadcastOwnHandle(&wg)
 
-	// Listener for is-alive broadcasts from other hosts. Listening on 33333
-	go listenAndRegisterUsers(&wg)
+		// Listener for is-alive broadcasts from other hosts. Listening on 33333
+		go listenAndRegisterUsers(&wg)
+	}
 
 	// gRPC listener
 	go startServer(&wg)
