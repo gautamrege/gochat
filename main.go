@@ -2,8 +2,10 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -100,7 +102,22 @@ func parseAndExecInput(chat Chatter, source, input string) {
 		chat.Render(helpStr)
 		break
 	case strings.ToLower(cmd) == "/users":
-		chat.Render(USERS.String())
+		users := USERS.String()
+		if source == "ws" {
+			data := struct {
+				Users string `json:"users"`
+			}{users}
+
+			bytes, err := json.Marshal(data)
+			if err != nil {
+				log.Print(err)
+				break
+			}
+
+			users = string(bytes)
+		}
+
+		chat.Render(users)
 		break
 	case strings.ToLower(cmd) == "/exit":
 		os.Exit(1)

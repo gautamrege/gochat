@@ -92,6 +92,11 @@ window.addEventListener("load", function(evt) {
 	if (data.abuse) {
 	    var d = document.getElementById(data.chatid);
 	    d.style.color = 'red';
+	} else if (data.users) {
+            var d = document.createElement("div");
+			d.textContent = data.users; 
+            output.appendChild(d);
+            output.scroll(0, output.scrollHeight);
 	} else {
             var d = document.createElement("div");
             d.id = data.chatid;
