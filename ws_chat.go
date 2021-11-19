@@ -64,7 +64,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func WSRun() {
-	addr := "localhost:8080"
+	addr := ":8080"
 	http.HandleFunc("/WsChat", StartWsChat)
 	http.HandleFunc("/", home)
 	log.Fatal(http.ListenAndServe(addr, nil))
