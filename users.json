@@ -12,76 +12,100 @@
 		"public_ip": "3.143.170.102"
 	},
 	{
-		"name": "st1",
+		"name": "Aadhar",
 		"host": "172.31.27.18",
 		"port": 12345,
 		"public_ip": "3.129.244.41"
 	},
 	{
-		"name": "st2",
+		"name": "Akshay",
 		"host": "172.31.22.50",
 		"port": 12345,
 		"public_ip": "3.142.90.106"
 	},
 	{
-		"name": "st3",
+		"name": "Amareshwar",
 		"host": "172.31.30.162",
 		"port": 12345,
 		"public_ip": "18.188.177.72"
 	},
 	{
-		"name": "st4",
+		"name": "Amartya",
 		"host": "172.31.20.43",
 		"port": 12345,
 		"public_ip": "3.144.204.229"
 	},
 	{
-		"name": "st5",
+		"name": "Dibyendu",
+		"host": "172.31.29.114",
+		"port": 12345,
+		"public_ip": "18.217.57.16"
+	},
+	{
+		"name": "Hardik",
 		"host": "172.31.31.44",
 		"port": 12345,
 		"public_ip": "18.222.127.209"
 	},
 	{
-		"name": "st6",
+		"name": "Nikhil",
 		"host": "172.31.16.42",
 		"port": 12345,
 		"public_ip": "3.139.56.49"
 	},
 	{
-		"name": "st7",
+		"name": "Harsha",
 		"host": "172.31.21.106",
 		"port": 12345,
 		"public_ip": "18.116.98.149"
 	},
 	{
-		"name": "st8",
+		"name": "Shimanta",
 		"host": "172.31.21.74",
 		"port": 12345,
 		"public_ip": "3.141.36.134"
 	},
 	{
-		"name": "st9",
+		"name": "Shubham",
 		"host": "172.31.24.100",
 		"port": 12345,
 		"public_ip": "3.143.172.7"
 	},
 	{
-		"name": "st10",
+		"name": "Siddharth",
 		"host": "172.31.17.165",
 		"port": 12345,
 		"public_ip": "18.190.25.201"
 	},
 	{
-		"name": "st11",
+		"name": "Sourabh",
 		"host": "172.31.28.30",
 		"port": 12345,
 		"public_ip": "3.17.109.65"
 	},
 	{
-		"name": "st12",
+		"name": "Swagato",
 		"host": "172.31.24.122",
 		"port": 12345,
 		"public_ip": "13.59.27.24"
+	},
+	{
+		"name": "Swapnil",
+		"host": "172.31.26.24",
+		"port": 12345,
+		"public_ip": "18.220.48.226"
+	},
+	{
+		"name": "Vibhor",
+		"host": "172.31.24.151",
+		"port": 12345,
+		"public_ip": "18.117.163.134"
+	},
+	{
+		"name": "Ziya",
+		"host": "172.31.29.124",
+		"port": 12345,
+		"public_ip": "18.222.132.97"
 	},
 	{
 		"name": "Bot",
