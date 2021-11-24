@@ -13,7 +13,16 @@ import (
 )
 
 type chatServer struct {
+	chatter Chatter
 	api.UnimplementedGoChatServer
+}
+
+func NewChatter(source string) Chatter {
+	if source == "term" {
+		return &TERM
+	} else {
+		return &WS
+	}
 }
 
 func (s *chatServer) Chat(ctx context.Context, req *api.ChatRequest) (res *api.ChatResponse, err error) {
@@ -24,13 +33,23 @@ func (s *chatServer) Chat(ctx context.Context, req *api.ChatRequest) (res *api.C
 		return nil, err
 	}
 
-	if req.Source == "term" {
-		TERM.Render(string(message))
-		TERM.Moderate(*req)
-	} else if req.Source == "ws" {
-		WS.Render(string(message))
-		WS.Moderate(*req)
+	chatter := s.chatter
+	if chatter == nil {
+		chatter = NewChatter(req.Source)
 	}
+
+	chatter.Render(string(message))
+	chatter.Moderate(*req)
+
+	/*
+		if req.Source == "term" {
+			TERM.Render(string(message))
+			TERM.Moderate(*req)
+		} else if req.Source == "ws" {
+			WS.Render(string(message))
+			WS.Moderate(*req)
+		}
+	*/
 
 	// TODO-WORKSHOP-STEP-7: If this is a chat from an unknown user, insert into PeerHandleMap
 	if _, ok := USERS.Get(req.From.Name); !ok {
